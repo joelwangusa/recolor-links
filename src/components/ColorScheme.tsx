@@ -10,39 +10,11 @@ import {
   TableRow,
 } from "@/components/ui/table"
 import EnableBtn from "./EnableBtn";
+import { defaultSettings,
+  settingsType,
+  saveSettings,
+  loadSettings } from "@/lib/chrome"
 
-const defaultSettings = {
-  isEnabled: false,
-  selectedScheme: "protanopia",
-  VisitedColor: "#FF8C00",
-  UnvisitedColor: "#708090",
-  colorSchemes : [
-    {
-      key: "custom",
-      desc: "Custom Scheme",
-      visited: '#FF8C00', // Deep Orange
-      unvisited: '#708090' // Slate Gray
-    },
-    {
-      key: "protanopia",
-      desc: "Red-green color deficiency",
-      visited: '#0000FF', // Blue
-      unvisited: '#FFFF00' // Yellow
-    },
-    {
-      key: "tritanopia",
-      desc: "Blue-yellow color deficiency",
-      visited: '#FF00FF', // Magenta
-      unvisited: '#00FF00' // Green
-    },
-    {
-      key: "monochromacy",
-      desc: "Complete color deficiency",
-      visited: '#555555', // Gray
-      unvisited: '#AAAAAA' // Light Gray
-    },
-  ]
-}
 
 export function ColorSheme() {
   // to prevent the initial render
@@ -77,10 +49,17 @@ export function ColorSheme() {
       return;
     }
 
-    // fetch data from local storage
-    setSettings(settings)
-    console.log('Loading settings from local storage');
-    setIsDataLoaded(true);
+    const fetchSettings = async () => {
+      // fetch data from local storage
+      const local_settings = await loadSettings() as settingsType
+      if (local_settings) {
+        console.log('Loading settings from local storage');
+        saveSettings(local_settings)
+        setIsDataLoaded(true);
+      }
+    }
+
+    fetchSettings()
   }, []);
   
   // Save settings to local storage when any variable changes
@@ -100,8 +79,10 @@ export function ColorSheme() {
       settings.UnvisitedColor = colorSchemes.find((scheme) => scheme.key === selectedScheme)?.unvisited ?? settings.colorSchemes[0].unvisited
     }
 
+    // save settings to state
+    setSettings(settings)
     // save settings to local storage
-    console.log(settings)
+    saveSettings(settings)
   }, [isEnabled, selectedScheme, CustomVisitedColor, CustomUnvisitedColor])
 
   return (
