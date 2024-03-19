@@ -1,4 +1,4 @@
-import { useState } from "react"
+import { useState, useEffect, useRef } from "react"
 import {
   Table,
   TableBody,
@@ -45,15 +45,44 @@ let settings = {
 }
 const colorSchemes = settings.colorSchemes
 
-
 export function ColorSheme() {
+  // to prevent the initial render
+  const firstUpdate = useRef(true);
+  const [isDataLoaded, setIsDataLoaded] = useState(false);
   const [isEnabled, setIsEnabled] = useState(settings.isEnabled)
   const [selectedScheme, setSelectedScheme] = useState(settings.selectedScheme)
   const [CustomVisitedColor, setCustomVisitedColor] = useState(settings.colorSchemes[0].visited)
   const [CustomUnvisitedColor, setCustomUnvisitedColor] = useState(settings.colorSchemes[0].unvisited)
 
-  // save settings to local storage
-  const saveSettings = () => {
+  // handle color change for the input color picker
+  const handleColorChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const label = event.target.getAttribute('id')?.split('-')[1]
+    if (label === "visited") {
+      setCustomVisitedColor(event.target.value)
+    } else {
+      setCustomUnvisitedColor(event.target.value)
+    }
+  }
+
+  // handle radio button change
+  const handleRadioCheck = (event: React.ChangeEvent<HTMLInputElement>) => {
+    setSelectedScheme(event.target.value)
+  }
+  
+  // Load settings from local storage
+  useEffect(() => {
+    if (firstUpdate.current) {
+      firstUpdate.current = false;
+      return;
+    }
+    console.log('Loading settings from local storage');
+    setIsDataLoaded(true);
+  }, []);
+  
+  // Save settings to local storage when any variable changes
+  useEffect(() => {
+    if (!isDataLoaded) return;
+    
     settings.isEnabled = isEnabled
     settings.selectedScheme = selectedScheme
     settings.colorSchemes[0].visited = CustomVisitedColor
@@ -69,24 +98,7 @@ export function ColorSheme() {
 
     // save settings to local storage
     console.log(settings)
-  }
-
-  // handle color change for the input color picker
-  const handleColorChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const key = event.target.getAttribute('id')?.split('-')[1]
-    if (key === "visited") {
-      setCustomVisitedColor(event.target.value)
-    } else {
-      setCustomUnvisitedColor(event.target.value)
-    }
-  }
-
-  // handle radio button change
-  const handleRadioCheck = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const schemeName = event.target.value
-    setSelectedScheme(schemeName)
-    saveSettings()
-  }
+  }, [isEnabled, selectedScheme, CustomVisitedColor, CustomUnvisitedColor])
 
   return (
     <>
@@ -114,7 +126,8 @@ export function ColorSheme() {
             </TableCell>
             <TableCell>
               {colorScheme.key === "custom" ? (
-                <input id={"preview-visited-"+colorScheme.key} type="color"
+                <input id={"preview-visited"}
+                type="color"
                 onChange={handleColorChange}
                 value={CustomVisitedColor} />
               ) : (
@@ -123,7 +136,7 @@ export function ColorSheme() {
             </TableCell>
             <TableCell>
               {colorScheme.key === "custom" ? (
-                <input id={"preview-unvisited-"+colorScheme.key}
+                <input id={"preview-unvisited"}
                 type="color"
                 onChange={handleColorChange}
                 value={CustomUnvisitedColor} />

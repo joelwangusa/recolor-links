@@ -2,9 +2,8 @@ import { Switch } from "./ui/switch";
 import { Label } from "./ui/label";
 
 function EnableBtn({isEnabled, setIsEnabled}: {isEnabled: boolean, setIsEnabled: (value: boolean) => void}) {
-  const onSwitchChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const newValue = event.target.checked;
-    setIsEnabled(newValue);
+  const onSwitchChange = (checked: boolean) => {
+    setIsEnabled(checked)
   }
 
   return (
@@ -12,7 +11,7 @@ function EnableBtn({isEnabled, setIsEnabled}: {isEnabled: boolean, setIsEnabled:
       <Switch id="enable-btn"
       onCheckedChange={onSwitchChange}
       checked={isEnabled}/>
-      <Label htmlFor="airplane-mode">{isEnabled? "OFF": "ON"}</Label>
+      <Label htmlFor="airplane-mode">{isEnabled? "ON": "OFF"}</Label>
     </div>
   );
 }
