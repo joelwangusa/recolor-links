@@ -67,7 +67,7 @@ interface linksType {
 
 const setLinks = (links: linksType) => {
     return new Promise((resolve, reject) => {
-        chrome.storage.local.set({ links }, () => {
+        chrome.storage.sync.set({ links }, () => {
         if (chrome.runtime.lastError) {
             return reject(chrome.runtime.lastError);
         }
@@ -98,7 +98,7 @@ export interface settingsType {
 
 const setSettings = (settings: settingsType) => {
     return new Promise((resolve, reject) => {
-        chrome.storage.local.set({ settings }, () => {
+        chrome.storage.sync.set({ settings }, () => {
         if (chrome.runtime.lastError) {
             return reject(chrome.runtime.lastError)
         }
