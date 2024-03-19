@@ -11,9 +11,9 @@ import {
 } from "@/components/ui/table"
 import EnableBtn from "./EnableBtn";
 
-let settings = {
+const defaultSettings = {
   isEnabled: false,
-  selectedScheme: "custom",
+  selectedScheme: "protanopia",
   VisitedColor: "#FF8C00",
   UnvisitedColor: "#708090",
   colorSchemes : [
@@ -43,16 +43,17 @@ let settings = {
     },
   ]
 }
-const colorSchemes = settings.colorSchemes
 
 export function ColorSheme() {
   // to prevent the initial render
   const firstUpdate = useRef(true);
+  const [settings, setSettings] = useState(defaultSettings);
   const [isDataLoaded, setIsDataLoaded] = useState(false);
   const [isEnabled, setIsEnabled] = useState(settings.isEnabled)
   const [selectedScheme, setSelectedScheme] = useState(settings.selectedScheme)
   const [CustomVisitedColor, setCustomVisitedColor] = useState(settings.colorSchemes[0].visited)
   const [CustomUnvisitedColor, setCustomUnvisitedColor] = useState(settings.colorSchemes[0].unvisited)
+  const colorSchemes = settings.colorSchemes
 
   // handle color change for the input color picker
   const handleColorChange = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -75,6 +76,9 @@ export function ColorSheme() {
       firstUpdate.current = false;
       return;
     }
+
+    // fetch data from local storage
+    setSettings(settings)
     console.log('Loading settings from local storage');
     setIsDataLoaded(true);
   }, []);

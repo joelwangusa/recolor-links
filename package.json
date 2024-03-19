@@ -1,10 +1,10 @@
 {
-  "name": "react-vite-chrome-extension",
+  "name": "recholor-chrome-extension",
   "private": true,
-  "version": "0.0.0",
+  "version": "0.1.1",
   "type": "module",
   "author": {
-    "name": "mcnaveen"
+    "name": "Joel Zhuoer Wang"
   },
   "scripts": {
     "dev": "vite",
