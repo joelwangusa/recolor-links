@@ -1,11 +1,12 @@
-import EnableBtn from "./EnableBtn";
+import ColorScheme from "./ColorScheme";
+
 
 function Dashboard() {
   return (
-    <div className="flex items-center justify-center flex-wrap p-6">
-      <div className="flex items-center flex-shrink-0 text-gray-600 mr-6">
-        <EnableBtn />
-      </div>
+    <div className="p-4">
+        <div className="my-4 mx-auto">
+          <ColorScheme />
+        </div>
     </div>
   );
 }
