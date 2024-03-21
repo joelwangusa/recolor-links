@@ -9,7 +9,7 @@
   "scripts": {
     "dev": "vite",
     "build": "tsc && vite build && tsc src/scripts/*.ts --outDir dist/scripts",
-    "build:chrome": "pnpm build && bestzip ./recolor-links-extension.zip ./dist ./images manifest.json",
+    "build:chrome": "pnpm build && node release.js",
     "lint": "eslint . --ext ts,tsx --report-unused-disable-directives --max-warnings 0",
     "preview": "vite preview"
 
