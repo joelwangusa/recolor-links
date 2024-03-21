@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from "react"
+import { useState, useEffect } from "react"
 import {
   Table,
   TableBody,
@@ -18,14 +18,12 @@ import { defaultSettings,
 
 export function ColorSheme() {
   // to prevent the initial render
-  const firstUpdate = useRef(true);
   const [settings, setSettings] = useState(defaultSettings);
-  const [isDataLoaded, setIsDataLoaded] = useState(false);
   const [isEnabled, setIsEnabled] = useState(settings.isEnabled)
   const [selectedScheme, setSelectedScheme] = useState(settings.selectedScheme)
   const [CustomVisitedColor, setCustomVisitedColor] = useState(settings.colorSchemes[0].visited)
   const [CustomUnvisitedColor, setCustomUnvisitedColor] = useState(settings.colorSchemes[0].unvisited)
-  const colorSchemes = settings.colorSchemes
+  const [colorSchemes, setColorSchemes] = useState(settings.colorSchemes)
 
   // handle color change for the input color picker
   const handleColorChange = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -44,30 +42,29 @@ export function ColorSheme() {
   
   // Load settings from local storage
   useEffect(() => {
-    if (firstUpdate.current) {
-      firstUpdate.current = false;
-      return;
-    }
-
     const fetchSettings = async () => {
       // fetch data from local storage
       const local_settings = await loadSettings() as settingsType
       if (local_settings) {
-        console.log('Loading settings from local storage');
-        saveSettings(local_settings)
-        setIsDataLoaded(true);
+        console.log("loaded settings from storage", local_settings)
+        // Update state with the loaded settings
+        setSettings(local_settings)
+        setIsEnabled(local_settings.isEnabled)
+        setSelectedScheme(local_settings.selectedScheme)
+        setCustomVisitedColor(local_settings.VisitedColor)
+        setCustomUnvisitedColor(local_settings.UnvisitedColor)
+        setColorSchemes(local_settings.colorSchemes)
       }
     }
-
     fetchSettings()
   }, []);
-  
+
+
   // Save settings to local storage when any variable changes
   useEffect(() => {
-    if (!isDataLoaded) return;
-    
     settings.isEnabled = isEnabled
     settings.selectedScheme = selectedScheme
+    settings.colorSchemes = colorSchemes
     settings.colorSchemes[0].visited = CustomVisitedColor
     settings.colorSchemes[0].unvisited = CustomUnvisitedColor
     
@@ -75,15 +72,14 @@ export function ColorSheme() {
       settings.VisitedColor = CustomVisitedColor
       settings.UnvisitedColor = CustomUnvisitedColor
     } else {
-      settings.VisitedColor = colorSchemes.find((scheme) => scheme.key === selectedScheme)?.visited ?? settings.colorSchemes[0].visited
-      settings.UnvisitedColor = colorSchemes.find((scheme) => scheme.key === selectedScheme)?.unvisited ?? settings.colorSchemes[0].unvisited
+      settings.VisitedColor = settings.colorSchemes.find((scheme) => scheme.key === selectedScheme)?.visited ?? settings.colorSchemes[0].visited
+      settings.UnvisitedColor = settings.colorSchemes.find((scheme) => scheme.key === selectedScheme)?.unvisited ?? settings.colorSchemes[0].unvisited
     }
-
     // save settings to state
     setSettings(settings)
     // save settings to local storage
     saveSettings(settings)
-  }, [isEnabled, selectedScheme, CustomVisitedColor, CustomUnvisitedColor])
+  }, [isEnabled, selectedScheme, CustomVisitedColor, CustomUnvisitedColor, colorSchemes])
 
   return (
     <>

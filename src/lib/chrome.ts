@@ -97,20 +97,20 @@ export interface settingsType {
 }
 
 const setSettings = (settings: settingsType) => {
+    console.log("In setSettings", settings)
     return new Promise((resolve, reject) => {
         chrome.storage.sync.set({ settings }, () => {
-        if (chrome.runtime.lastError) {
+          if (chrome.runtime.lastError) {
             return reject(chrome.runtime.lastError)
-        }
-        resolve(true)
+          }
+          resolve(true)
         });
     })
 }
 
 export const saveSettings = async (settings: settingsType) => {
     try {
-        console.log(settings)
-        setSettings(settings)
+        await setSettings(settings)
     } catch (error) {
         console.error(error)
     }
@@ -129,7 +129,7 @@ export const saveNewLink = async (links: linksType, url: string) => {
 
 export const loadSettings = async () => {
   try {
-    let settings = await getSettings();
+    const settings = await getSettings();
     return settings;
   } catch (defaultSettings) {
     console.log("Loading default settings");
