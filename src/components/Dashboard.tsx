@@ -1,4 +1,4 @@
-import ColorScheme from "./ColorScheme";
+import ColorScheme from "./scheme";
 
 
 function Dashboard() {

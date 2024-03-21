@@ -9,7 +9,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table"
-import EnableBtn from "./EnableBtn";
+import EnableBtn from "./enable";
 import { defaultSettings,
   settingsType,
   saveSettings,

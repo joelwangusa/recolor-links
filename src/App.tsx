@@ -1,9 +1,9 @@
-import Header from "./components/Banner";
-import Dashboard from "./components/Dashboard";
+import Header from "./components/banner";
+import Dashboard from "./components/dashboard";
 
 function App() {
   return (
-    <div>
+    <div className="w-[500px]">
       <Header />
       <Dashboard />
     </div>
