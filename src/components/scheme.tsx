@@ -19,25 +19,28 @@ import { defaultSettings,
 export function ColorSheme() {
   // to prevent the initial render
   const [settings, setSettings] = useState(defaultSettings);
-  const [isEnabled, setIsEnabled] = useState(settings.isEnabled)
-  const [selectedScheme, setSelectedScheme] = useState(settings.selectedScheme)
-  const [CustomVisitedColor, setCustomVisitedColor] = useState(settings.colorSchemes[0].visited)
-  const [CustomUnvisitedColor, setCustomUnvisitedColor] = useState(settings.colorSchemes[0].unvisited)
-  const [colorSchemes, setColorSchemes] = useState(settings.colorSchemes)
+  const [customVisited, setCustomVisited] = useState(settings.colorSchemes[0].visited)
+  const [customUnvisited, setCustomUnvisited] = useState(settings.colorSchemes[0].unvisited)
 
   // handle color change for the input color picker
   const handleColorChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const label = event.target.getAttribute('id')?.split('-')[1]
+    const newSettings = { ...settings }
     if (label === "visited") {
-      setCustomVisitedColor(event.target.value)
+      setCustomVisited(event.target.value)
+      newSettings.colorSchemes[0].visited = event.target.value
     } else {
-      setCustomUnvisitedColor(event.target.value)
+      setCustomUnvisited(event.target.value)
+      newSettings.colorSchemes[0].unvisited = event.target.value
     }
+    setSettings(newSettings)
   }
 
   // handle radio button change
   const handleRadioCheck = (event: React.ChangeEvent<HTMLInputElement>) => {
-    setSelectedScheme(event.target.value)
+    const newSettings = { ...settings }
+    newSettings.selectedScheme = event.target.value
+    setSettings(newSettings)
   }
   
   // Load settings from local storage
@@ -46,14 +49,10 @@ export function ColorSheme() {
       // fetch data from local storage
       const local_settings = await loadSettings() as settingsType
       if (local_settings) {
-        console.log("loaded settings from storage", local_settings)
         // Update state with the loaded settings
         setSettings(local_settings)
-        setIsEnabled(local_settings.isEnabled)
-        setSelectedScheme(local_settings.selectedScheme)
-        setCustomVisitedColor(local_settings.VisitedColor)
-        setCustomUnvisitedColor(local_settings.UnvisitedColor)
-        setColorSchemes(local_settings.colorSchemes)
+        setCustomVisited(local_settings.colorSchemes[0].visited)
+        setCustomUnvisited(local_settings.colorSchemes[0].unvisited)
       }
     }
     fetchSettings()
@@ -62,24 +61,9 @@ export function ColorSheme() {
 
   // Save settings to local storage when any variable changes
   useEffect(() => {
-    settings.isEnabled = isEnabled
-    settings.selectedScheme = selectedScheme
-    settings.colorSchemes = colorSchemes
-    settings.colorSchemes[0].visited = CustomVisitedColor
-    settings.colorSchemes[0].unvisited = CustomUnvisitedColor
-    
-    if (selectedScheme === "custom") {
-      settings.VisitedColor = CustomVisitedColor
-      settings.UnvisitedColor = CustomUnvisitedColor
-    } else {
-      settings.VisitedColor = settings.colorSchemes.find((scheme) => scheme.key === selectedScheme)?.visited ?? settings.colorSchemes[0].visited
-      settings.UnvisitedColor = settings.colorSchemes.find((scheme) => scheme.key === selectedScheme)?.unvisited ?? settings.colorSchemes[0].unvisited
-    }
-    // save settings to state
-    setSettings(settings)
     // save settings to local storage
     saveSettings(settings)
-  }, [isEnabled, selectedScheme, CustomVisitedColor, CustomUnvisitedColor, colorSchemes])
+  }, [settings])
 
   return (
     <>
@@ -93,14 +77,14 @@ export function ColorSheme() {
         </TableRow>
       </TableHeader>
       <TableBody>
-        {colorSchemes.map((colorScheme) => (
+        {settings.colorSchemes.map((colorScheme) => (
           <TableRow key={colorScheme.key} >
             <TableCell className="font-medium">
               <input id={"color-"+colorScheme.key}
               type="radio"
               onChange={handleRadioCheck}
               value={colorScheme.key}
-              checked={selectedScheme === colorScheme.key}
+              checked={settings.selectedScheme === colorScheme.key}
               name="color-scheme"
               className="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600" />
               <label htmlFor={"color-"+colorScheme.key} className="ms-2 text-sm font-medium text-gray-900 dark:text-gray-300">{colorScheme.desc}</label>           
@@ -110,7 +94,7 @@ export function ColorSheme() {
                 <input id={"preview-visited"}
                 type="color"
                 onChange={handleColorChange}
-                value={CustomVisitedColor} />
+                value={customVisited} />
               ) : (
                 <div className="w-8 h-4 border border-gray-300 dark:border-gray-600" style={{backgroundColor: colorScheme.visited}} />
               )}
@@ -120,7 +104,7 @@ export function ColorSheme() {
                 <input id={"preview-unvisited"}
                 type="color"
                 onChange={handleColorChange}
-                value={CustomUnvisitedColor} />
+                value={customUnvisited} />
               ) : (
                 <div className="w-8 h-4 border border-gray-300 dark:border-gray-600" style={{backgroundColor: colorScheme.unvisited}} />
               )}
@@ -132,7 +116,8 @@ export function ColorSheme() {
       </TableFooter>
     </Table>
     <div className="my-4 w-20 mx-auto">
-      <EnableBtn isEnabled={isEnabled} setIsEnabled={setIsEnabled}/>    </div>
+      <EnableBtn settings={settings} setSettings={setSettings}/>
+    </div>
     </>
   )
 }

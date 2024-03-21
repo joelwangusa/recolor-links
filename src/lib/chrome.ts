@@ -97,7 +97,6 @@ export interface settingsType {
 }
 
 const setSettings = (settings: settingsType) => {
-    console.log("In setSettings", settings)
     return new Promise((resolve, reject) => {
         chrome.storage.sync.set({ settings }, () => {
           if (chrome.runtime.lastError) {
@@ -132,7 +131,6 @@ export const loadSettings = async () => {
     const settings = await getSettings();
     return settings;
   } catch (defaultSettings) {
-    console.log("Loading default settings");
     return defaultSettings;
   }
 }
