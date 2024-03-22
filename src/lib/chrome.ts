@@ -1,8 +1,21 @@
+export interface settingsType {
+    isEnabled: boolean;
+    selectedScheme: string;
+    visitedColor: string;
+    unvisitedColor: string;
+    colorSchemes: {
+        key: string;
+        desc: string;
+        visited: string;
+        unvisited: string;
+    }[];
+}
+
 export const defaultSettings = {
   isEnabled: false,
   selectedScheme: "protanopia",
-  VisitedColor: "#FF8C00",
-  UnvisitedColor: "#708090",
+  visitedColor: "#FF8C00",
+  unvisitedColor: "#708090",
   colorSchemes : [
     {
       key: "custom",
@@ -82,21 +95,7 @@ export function sendMessageToContent(data :{message: string, settings: settingsT
   }
 }
 
-
-export interface settingsType {
-    isEnabled: boolean;
-    selectedScheme: string;
-    VisitedColor: string;
-    UnvisitedColor: string;
-    colorSchemes: {
-        key: string;
-        desc: string;
-        visited: string;
-        unvisited: string;
-    }[];
-}
-
-const setSettings = (settings: settingsType) => {
+const saveSettingsToStorage = (settings: settingsType) => {
     return new Promise((resolve, reject) => {
         chrome.storage.sync.set({ settings }, () => {
           if (chrome.runtime.lastError) {
@@ -107,9 +106,20 @@ const setSettings = (settings: settingsType) => {
     })
 }
 
+// Notify the content script that the settings have been updated
+const notifyContentScript = (settings: settingsType) => {
+    chrome.tabs.query({active: true, currentWindow: true}, function(tabs) {
+        console.log(tabs[0], "this is tabs")
+        if (tabs[0] && tabs[0].id !== undefined) {
+          chrome.tabs.sendMessage(tabs[0].id, { message: "settingsUpdated", settings });
+        }
+    });
+}
+
 export const saveSettings = async (settings: settingsType) => {
     try {
-        await setSettings(settings)
+        await saveSettingsToStorage(settings)
+        notifyContentScript(settings)
     } catch (error) {
         console.error(error)
     }

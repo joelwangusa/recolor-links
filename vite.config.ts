@@ -1,6 +1,7 @@
 import path from "path"
 import react from "@vitejs/plugin-react"
 import { defineConfig } from "vite"
+import fs from 'fs'
 
 export default defineConfig({
   plugins: [
@@ -12,6 +13,8 @@ export default defineConfig({
       input: {
         main: './index.html',
         //options: './options.html'
+        content: 'src/scripts/content.ts',
+        background: 'src/scripts/background.ts'
       }
     }
   },

@@ -40,6 +40,8 @@ export function ColorSheme() {
   const handleRadioCheck = (event: React.ChangeEvent<HTMLInputElement>) => {
     const newSettings = { ...settings }
     newSettings.selectedScheme = event.target.value
+    newSettings.visitedColor = newSettings.colorSchemes.find((scheme) => scheme.key === event.target.value)?.visited || newSettings.visitedColor
+    newSettings.unvisitedColor = newSettings.colorSchemes.find((scheme) => scheme.key === event.target.value)?.unvisited || newSettings.unvisitedColor
     setSettings(newSettings)
   }
   

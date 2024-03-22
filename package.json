@@ -8,7 +8,7 @@
   },
   "scripts": {
     "dev": "vite",
-    "build": "tsc && vite build && tsc src/scripts/*.ts --outDir dist/scripts",
+    "build": "tsc && vite build && node postbuild.js",
     "build:chrome": "pnpm build && node release.js",
     "lint": "eslint . --ext ts,tsx --report-unused-disable-directives --max-warnings 0",
     "preview": "vite preview"
