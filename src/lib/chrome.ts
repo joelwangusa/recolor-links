@@ -53,7 +53,7 @@ const getSettings = () => {
       if (results.settings) {
         resolve(results.settings);
       } else {
-        reject(defaultSettings);
+        reject(null);
       }
     });
   });
@@ -108,8 +108,8 @@ const saveSettingsToStorage = (settings: settingsType) => {
 
 // Notify the content script that the settings have been updated
 const notifyContentScript = (settings: settingsType) => {
+    console.log("notifyContentScript", settings)
     chrome.tabs.query({active: true, currentWindow: true}, function(tabs) {
-        console.log(tabs[0], "this is tabs")
         if (tabs[0] && tabs[0].id !== undefined) {
           chrome.tabs.sendMessage(tabs[0].id, { message: "settingsUpdated", settings });
         }
@@ -140,8 +140,8 @@ export const loadSettings = async () => {
   try {
     const settings = await getSettings();
     return settings;
-  } catch (defaultSettings) {
-    return defaultSettings;
+  } catch (error) {
+    console.error(error);
   }
 }
 

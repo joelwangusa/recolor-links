@@ -13,8 +13,6 @@ clickedLinks.add('https://www.google.com')
 clickedLinks.add('https://www.yahoo.com')
 clickedLinks.add('https://www.bing.com')
 
-console.log("I am in content.ts")
-
 // Function to apply styles to links based on click events
 function applyLinkStyles(data: StorageData) {
     document.querySelectorAll('a').forEach(link => {
@@ -62,9 +60,6 @@ function updateLocalStorageWithClick(url: string) {
 }
 
 const applyNewSettings = (data: StorageData) => {
-    console.log("I am in applyNewSettings")
-    console.log(data.settings)
-
     if (data.settings.isEnabled) {
         const typedData = data as StorageData
         typedData.clickedLinks = clickedLinks
@@ -80,8 +75,9 @@ chrome.storage.sync.get(['settings'], (data) => {
 
 chrome.runtime.onMessage.addListener(
   function(request) {
+    console.log("received message in content.js", request.settings) 
     if (request.message === "settingsUpdated") {
-        const typedData = request as StorageData
+        const typedData = {"settings": request.settings} as StorageData
         applyNewSettings(typedData)
     }
   }

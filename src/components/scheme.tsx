@@ -25,15 +25,25 @@ export function ColorSheme() {
   // handle color change for the input color picker
   const handleColorChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const label = event.target.getAttribute('id')?.split('-')[1]
+    const color = event.target.value
     const newSettings = { ...settings }
+    const selctedScheme = newSettings.selectedScheme
+
     if (label === "visited") {
-      setCustomVisited(event.target.value)
-      newSettings.colorSchemes[0].visited = event.target.value
+      setCustomVisited(color)
+      newSettings.colorSchemes[0].visited = color
+      if (selctedScheme === "custom") {
+        newSettings.visitedColor = color
+      }
     } else {
-      setCustomUnvisited(event.target.value)
-      newSettings.colorSchemes[0].unvisited = event.target.value
+      setCustomUnvisited(color)
+      newSettings.colorSchemes[0].unvisited = color
+      if (selctedScheme === "custom") {
+        newSettings.unvisitedColor = color
+      }
     }
     setSettings(newSettings)
+    saveSettings(newSettings)
   }
 
   // handle radio button change
