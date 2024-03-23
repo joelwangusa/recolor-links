@@ -78,11 +78,15 @@ const saveSettingsToStorage = (settings: settingsType) => {
 
 // Notify the content script that the settings have been updated
 const notifyContentScript = (settings: settingsType) => {
-  chrome.tabs.query({active: true, currentWindow: true}, function(tabs) {
-      if (tabs[0] && tabs[0].id !== undefined) {
-        chrome.tabs.sendMessage(tabs[0].id, { message: "settingsUpdated", settings });
-      }
-  })
+  try {
+    chrome.tabs.query({active: true, currentWindow: true}, function(tabs) {
+        if (tabs[0] && tabs[0].id !== undefined) {
+          chrome.tabs.sendMessage(tabs[0].id, { message: "settingsUpdated", settings });
+        }
+    })
+  } catch (error) {
+    console.error(error)
+  }
 }
 
 export const saveSettings = async (settings: settingsType) => {

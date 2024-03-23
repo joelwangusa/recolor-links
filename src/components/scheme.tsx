@@ -57,7 +57,6 @@ export function ColorSheme() {
   }
   
   const handleEnable = (checked: boolean) => {
-    console.log(checked, "scheme page, after enable")
     const newSettings = { ...settings }
     setIsEnabled(checked)
     newSettings.isEnabled = checked
@@ -78,6 +77,7 @@ export function ColorSheme() {
         setIsEnabled(local_settings.isEnabled)
       }
     }
+    
     fetchSettings()
   }, []);
 

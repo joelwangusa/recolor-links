@@ -27,7 +27,6 @@
     },
     "permissions": [
         "storage",
-        "tabs",
         "activeTab"
     ],
     "homepage_url": "https://softwarehow.com",

@@ -1,5 +1,7 @@
 import { settingsType } from "@/lib/chrome"
 
+chrome.runtime.sendMessage({ type: 'content-ready' });
+
 interface StorageData {
   settings: settingsType;
 }

@@ -20,7 +20,6 @@ chrome.runtime.onSuspend.addListener(() => {
 
 chrome.runtime.onMessage.addListener(
   function(request) {
-    console.log("received message in background.js", request.url) 
     if (request.message === "newClickedLink") {
         const url = request.url as string
         clickedLinks.add(url)
