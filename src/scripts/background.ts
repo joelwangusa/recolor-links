@@ -1,6 +1,6 @@
 let clickedLinks = new Set<string>()
-let saveThreshold = 3
-let saveInterval = 60 * 1000 // 1 minute
+const saveThreshold = 3
+const saveInterval = 60 * 1000 // 1 minute
 let newUpdate = false
 
 // Initial background.js load the clickedLinks from storage
