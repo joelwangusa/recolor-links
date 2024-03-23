@@ -21,6 +21,7 @@ export function ColorSheme() {
   const [settings, setSettings] = useState(defaultSettings);
   const [customVisited, setCustomVisited] = useState(settings.colorSchemes[0].visited)
   const [customUnvisited, setCustomUnvisited] = useState(settings.colorSchemes[0].unvisited)
+  const [isEnabled, setIsEnabled] = useState(settings.isEnabled)
 
   // handle color change for the input color picker
   const handleColorChange = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -55,16 +56,26 @@ export function ColorSheme() {
     setSettings(newSettings)
   }
   
+  const handleEnable = (checked: boolean) => {
+    console.log(checked, "scheme page, after enable")
+    const newSettings = { ...settings }
+    setIsEnabled(checked)
+    newSettings.isEnabled = checked
+    setSettings(newSettings)
+  }
+
   // Load settings from local storage
   useEffect(() => {
     const fetchSettings = async () => {
       // fetch data from local storage
       const local_settings = await loadSettings() as settingsType
+      console.log(local_settings, "scheme page")
       if (local_settings) {
         // Update state with the loaded settings
         setSettings(local_settings)
         setCustomVisited(local_settings.colorSchemes[0].visited)
         setCustomUnvisited(local_settings.colorSchemes[0].unvisited)
+        setIsEnabled(local_settings.isEnabled)
       }
     }
     fetchSettings()
@@ -128,7 +139,7 @@ export function ColorSheme() {
       </TableFooter>
     </Table>
     <div className="my-4 w-20 mx-auto">
-      <EnableBtn settings={settings} setSettings={setSettings}/>
+      <EnableBtn isEnabled={isEnabled} handleEnable={handleEnable}/>
     </div>
     </>
   )

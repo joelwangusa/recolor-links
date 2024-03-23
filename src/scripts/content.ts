@@ -2,16 +2,10 @@ import { settingsType } from "@/lib/chrome"
 
 interface StorageData {
   settings: settingsType;
-  clickedLinks?: Set<string>;
 }
 
 // global variable to store clicked links
 let clickedLinks = new Set<string>()
-
-// add some test data
-clickedLinks.add('https://www.google.com')
-clickedLinks.add('https://www.yahoo.com')
-clickedLinks.add('https://www.bing.com')
 
 // Function to apply styles to links based on click events
 function applyLinkStyles(data: StorageData) {
@@ -53,32 +47,76 @@ function linkClickHandler(visitedColor: string, url: string, event: MouseEvent) 
 }
 
 function updateLocalStorageWithClick(url: string) {
+    // if url is empty or already clicked, return
+    if (!url || clickedLinks.has(url)) {
+        return;
+    }
+
     clickedLinks.add(url)
-    /*
-    chrome.storage.local.set({clickedLinks});
-    */
+    const message = "newClickedLink"
+    // send message to background.js to save the clicked link
+    chrome.runtime.sendMessage({message, url});
 }
 
 const applyNewSettings = (data: StorageData) => {
-    if (data.settings.isEnabled) {
+    if (data.settings && data.settings.isEnabled) {
         const typedData = data as StorageData
-        typedData.clickedLinks = clickedLinks
         applyLinkStyles(typedData)
         observeDOM(typedData);
     }
 }
-// Initial setup: Get settings and apply styles
-chrome.storage.sync.get(['settings'], (data) => {
-    const typedData = data as StorageData
-    applyNewSettings(typedData)
-})
 
+const getClickedLinks = (): Promise<Set<string>> => {
+    return new Promise((resolve, reject) => {
+        chrome.storage.local.get(['clickedLinks'], (data) => {
+            if (chrome.runtime.lastError) {
+                reject(chrome.runtime.lastError);
+            } else {
+                clickedLinks = new Set(data.clickedLinks);
+                resolve(clickedLinks as Set<string>);
+            }
+        });
+    })
+}
+
+
+// Initial setup: Get settings and apply styles
+const getStorageData = (): Promise<StorageData> => {
+    return new Promise((resolve, reject) => {
+        chrome.storage.sync.get(['settings', 'clickedLinks'], (data) => {
+            if (chrome.runtime.lastError) {
+                reject(chrome.runtime.lastError);
+            } else {
+                resolve(data as StorageData);
+            }
+        });
+    });
+}
+
+// Initial setup: Get settings and apply styles
+const setup = async () => {
+    const typedData = await getStorageData();
+    await getClickedLinks()
+    applyNewSettings(typedData);
+}
+
+
+// Listen for messages from popup.js to update settings
 chrome.runtime.onMessage.addListener(
   function(request) {
-    console.log("received message in content.js", request.settings) 
     if (request.message === "settingsUpdated") {
         const typedData = {"settings": request.settings} as StorageData
         applyNewSettings(typedData)
     }
   }
 )
+
+window.onbeforeunload = function() {
+    try {
+        chrome.runtime.sendMessage({message: "tabClosing"});
+    } catch (error) {
+        console.error("Failed to send message: ", error);
+    }
+}
+
+setup()
